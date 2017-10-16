@@ -1,4 +1,13 @@
+import java.io.BufferedWriter;
 import java.io.Console;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -6,10 +15,12 @@ import java.util.List;
 
 
 public class exhaustiveAlgorithm {
-	public static int size = 3;
+	public static int size = 4;
+	public static int permutations = 0;
+	
 	public static int square[][] = new int[size][size];
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws UnsupportedEncodingException, FileNotFoundException, IOException {
 		
 		long startTime = System.currentTimeMillis();
 		
@@ -33,7 +44,7 @@ public class exhaustiveAlgorithm {
 		//test each matrix to determine if it is a valid magic circle
 		
 		//option randomly shuffle to test other functions...
-	//	System.out.print("testing exhaustive search\n");
+		System.out.print("testing exhaustive search\n");
 		permute(values1,0);
 		
 		
@@ -119,8 +130,10 @@ public class exhaustiveAlgorithm {
 		long endTime   = System.currentTimeMillis();
 		long totalTime = endTime - startTime;
 		System.out.println("Total runtime = " + totalTime +"ms");
+		System.out.println("Total permutations = " + permutations);
 	}
-    static void permute(java.util.List<Integer> arr, int k){
+    static void permute(java.util.List<Integer> arr, int k) throws UnsupportedEncodingException, FileNotFoundException, IOException{
+    	permutations++;
         for(int i = k; i < arr.size(); i++){
             java.util.Collections.swap(arr, i, k);
             permute(arr, k+1);
@@ -139,11 +152,30 @@ public class exhaustiveAlgorithm {
 			}
 			if (isMagicSquare(square,size)){
 				print(square,size);
+				printToFile("output.txt",square,size);
 			}
-			
-            
         }
     }
+	public static void printToFile(String filename,int[][] square, int size) throws UnsupportedEncodingException, FileNotFoundException, IOException{
+		
+		try (FileWriter fw = new FileWriter(filename, true);
+			BufferedWriter bw = new BufferedWriter(fw);
+			PrintWriter out = new PrintWriter(bw))
+			{
+			out.println("");
+			
+				for (int i= 0; i < size; i++){
+					for (int j = 0; j < size; j++){
+						out.print(square[i][j] + "\t");
+					}
+					out.println("\n");
+				}
+
+			} catch (IOException e) {
+			    //exception handling left as an exercise for the reader
+			} 
+
+	}
 	static boolean isMagicSquare(int[][] square, int size){
 		boolean retval = false;
 		int hSum = 0;
@@ -177,7 +209,7 @@ public class exhaustiveAlgorithm {
 		for (int i= 0; i < size; i++){
 			dSum = dSum + square[i][i];
 		}
-		//check diagonal forwards
+		//check diagonal backwards
 		int d2Sum = 0;
 		int s2 = size-1;
 		for (int i= 0; i < size; i++){
